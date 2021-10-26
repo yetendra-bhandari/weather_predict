@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Predictor</title>
+    <style>
+      body {
+        background-color: darkslategrey;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Message: {{ message|default_if_none:"---" }}</p>
+    <h2>Upload you previous weather data</h2>
+    <form action="{% url 'upload' %}" method="post">
+      {% csrf_token %}
+      <fieldset>
+        <input
+          type="file"
+          name="data"
+          required
+        />
+      </fieldset>
+      <input type="submit" value="Upload" />
+    </form>
+    <h2>Current weather</h2>
+    <form action="{% url 'predict' %}" method="post">
+      {% csrf_token %}
+      <fieldset>
+        <select name="outlook" id="outlook">
+          <option value="none">Select Outlook</option>
+          <option value="sunny">Sunny</option>
+          <option value="overcast">Overcast</option>
+          <option value="Rainy">Rainy</option>
+        </select>
+        <select name="temp" id="temp">
+          <option value="none">Select Temperature</option>
+          <option value="high">High</option>
+          <option value="mild">Mild</option>
+          <option value="ood">Cood</option>
+        </select>
+        <select name="humidity" id="humidity">
+          <option value="none">Select Humidity</option>
+          <option value="high">High</option>
+          <option value="normal">Normal</option>
+        </select>
+        <select name="windy" id="windy">
+          <option value="none">Select Windy</option>
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </select>
+      </fieldset>
+      <input type="submit" value="Predict Weather" />
+    </form>
+  </body>
+</html>
