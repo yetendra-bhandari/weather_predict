@@ -103,3 +103,7 @@ def processCSV(data):
         'is_humidity_selected': is_humidity_selected,
         'is_windy_selected': is_windy_selected
     }
+
+
+def getProbability(data, outlook, temp, humidity, windy):
+    return 0, 0

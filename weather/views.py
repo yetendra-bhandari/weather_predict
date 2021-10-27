@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .models import User, Data
-from .utils import processCSV
+from .utils import processCSV, getProbability
 
 
 def home(request):
@@ -18,7 +18,7 @@ def app(request):
         request.session['message'] = 'Login Required'
         return HttpResponseRedirect(reverse('home'))
     message = request.session.pop('message', None)
-    return render(request, 'weather/app.html', {'message': message, 'name': request.session['name']})
+    return render(request, 'weather/app.html', {'message': message, 'name': request.session['name'], 'datalist': Data.objects.filter(user__id=request.session['id'])})
 
 
 def upload(request):
@@ -38,7 +38,19 @@ def upload(request):
 
 
 def predict(request):
-    return HttpResponseRedirect(reverse('app'))
+    try:
+        data_id, outlook, temp, humidity, windy = request.GET['data'], request.GET[
+            'outlook'], request.GET['temp'], request.GET['humidity'], request.GET['windy']
+        print(data_id, outlook, temp, humidity, windy)
+        data = Data.objects.get(user__id=request.session['id'], id=data_id)
+        good, bad = getProbability(
+            data, outlook, temp, humidity, windy)
+        request.session['message'] = 'Good Weather Probability = ' + \
+            str(good) + ', Bad Weather Probability = ' + str(bad)
+    except Exception as e:
+        print(e)
+    finally:
+        return HttpResponseRedirect(reverse('app'))
 
 
 def register(request):
