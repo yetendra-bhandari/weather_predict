@@ -1,6 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.db import IntegrityError
 
 from weather.models import User
 
@@ -33,7 +34,7 @@ def register(request):
         request.session['name'] = user.name
         request.session['message'] = 'Registration Successful'
         return HttpResponseRedirect(reverse('app'))
-    except:
+    except(IntegrityError):
         request.session['message'] = 'Invalid User Details'
         return HttpResponseRedirect(reverse('home'))
 
@@ -46,7 +47,7 @@ def login(request):
         request.session['name'] = user.name
         request.session['message'] = 'Login Successful'
         return HttpResponseRedirect(reverse('app'))
-    except:
+    except(User.DoesNotExist, AssertionError):
         request.session['message'] = 'Invalid Email Or Password'
         return HttpResponseRedirect(reverse('home'))
 
