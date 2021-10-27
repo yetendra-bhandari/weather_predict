@@ -14,6 +14,9 @@ def home(request):
 
 
 def app(request):
+    if 'id' not in request.session:
+        request.session['message'] = 'Login Required'
+        return HttpResponseRedirect(reverse('home'))
     message = request.session.pop('message', None)
     return render(request, 'weather/app.html', {'message': message, 'name': request.session['name']})
 
