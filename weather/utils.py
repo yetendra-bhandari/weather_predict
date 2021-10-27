@@ -1,3 +1,8 @@
+from .models import Data
+
+precision = 5
+
+
 def processCSV(data):
     rows = data.read().decode('UTF-8').split('\n')
     total_good, total_bad = 0, 0
@@ -74,38 +79,76 @@ def processCSV(data):
                 bad_windy_true += 1
             else:
                 bad_windy_false += 1
+    total = total_good + total_bad
+    return {
+        'good_weather': total_good/total,
+        'good_outlook_sunny': good_outlook_sunny/total_good,
+        'good_outlook_overcast': good_outlook_overcast/total_good,
+        'good_outlook_rainy': good_outlook_rainy/total_good,
+        'good_temp_high': good_temp_high/total_good,
+        'good_temp_mild': good_temp_mild/total_good,
+        'good_temp_cool': good_temp_cool/total_good,
+        'good_humidity_high': good_humidity_high/total_good,
+        'good_humidity_normal': good_humidity_normal/total_good,
+        'good_windy_true': good_windy_true/total_good,
+        'good_windy_false': good_windy_false/total_good,
+        'bad_weather': total_bad/total,
+        'bad_outlook_sunny': bad_outlook_sunny/total_bad,
+        'bad_outlook_overcast': bad_outlook_overcast/total_bad,
+        'bad_outlook_rainy': bad_outlook_rainy/total_bad,
+        'bad_temp_high': bad_temp_high/total_bad,
+        'bad_temp_mild': bad_temp_mild/total_bad,
+        'bad_temp_cool': bad_temp_cool/total_bad,
+        'bad_humidity_high': bad_humidity_high/total_bad,
+        'bad_humidity_normal': bad_humidity_normal/total_bad,
+        'bad_windy_true': bad_windy_true/total_bad,
+        'bad_windy_false': bad_windy_false/total_bad,
+        'is_outlook_selected': is_outlook_selected,
+        'is_temp_selected': is_temp_selected,
+        'is_humidity_selected': is_humidity_selected,
+        'is_windy_selected': is_windy_selected
+    }
 
 
-<< << << < HEAD
+def getProbability(data: Data, outlook, temp, humidity, windy):
+    good, bad = data.good_weather, data.bad_weather
 
-== == == =
->>>>>> > 4ed05b710436719521c9490c5263e0e536b21012
-total = total_good + total_bad
-return {
-    'good_weather': total_good/total,
-    'good_outlook_sunny': good_outlook_sunny/total_good,
-    'good_outlook_overcast': good_outlook_overcast/total_good,
-    'good_outlook_rainy': good_outlook_rainy/total_good,
-    'good_temp_high': good_temp_high/total_good,
-    'good_temp_mild': good_temp_mild/total_good,
-    'good_temp_cool': good_temp_cool/total_good,
-    'good_humidity_high': good_humidity_high/total_good,
-    'good_humidity_normal': good_humidity_normal/total_good,
-    'good_windy_true': good_windy_true/total_good,
-    'good_windy_false': good_windy_false/total_good,
-    'bad_weather': total_bad/total,
-    'bad_outlook_sunny': bad_outlook_sunny/total_bad,
-    'bad_outlook_overcast': bad_outlook_overcast/total_bad,
-    'bad_outlook_rainy': bad_outlook_rainy/total_bad,
-    'bad_temp_high': bad_temp_high/total_bad,
-    'bad_temp_mild': bad_temp_mild/total_bad,
-    'bad_temp_cool': bad_temp_cool/total_bad,
-    'bad_humidity_high': bad_humidity_high/total_bad,
-    'bad_humidity_normal': bad_humidity_normal/total_bad,
-    'bad_windy_true': bad_windy_true/total_bad,
-    'bad_windy_false': bad_windy_false/total_bad,
-    'is_outlook_selected': is_outlook_selected,
-    'is_temp_selected': is_temp_selected,
-    'is_humidity_selected': is_humidity_selected,
-    'is_windy_selected': is_windy_selected
-}
+    if data.is_outlook_selected:
+        if outlook == 'sunny':
+            good *= data.good_outlook_sunny
+            bad *= data.bad_outlook_sunny
+        elif outlook == 'overcast':
+            good *= data.good_outlook_overcast
+            bad *= data.bad_outlook_overcast
+        else:
+            good *= data.good_outlook_rainy
+            bad *= data.bad_outlook_rainy
+
+    if data.is_temp_selected:
+        if temp == 'high':
+            good *= data.good_temp_high
+            bad *= data.bad_temp_high
+        elif temp == 'mild':
+            good *= data.good_temp_mild
+            bad *= data.bad_temp_mild
+        else:
+            good *= data.good_temp_cool
+            bad *= data.bad_temp_cool
+
+    if data.is_humidity_selected:
+        if humidity == 'high':
+            good *= data.good_humidity_high
+            bad *= data.bad_humidity_high
+        else:
+            good *= data.good_humidity_normal
+            bad *= data.bad_humidity_normal
+
+    if data.is_windy_selected:
+        if windy == 'true':
+            good *= data.good_windy_true
+            bad *= data.bad_windy_true
+        else:
+            good *= data.good_windy_false
+            bad *= data.bad_windy_false
+
+    return round(good, precision), round(bad, precision)
