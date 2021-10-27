@@ -26,9 +26,9 @@ def upload(request):
         assert request.method == 'POST'
         data = request.FILES['data']
         if data.name.endswith('.csv'):
-            p = processCSV(data)
             Data.objects.create(
-                user=User.objects.get(id=request.session['id']), csvname=data.name, **p)
+                user=User.objects.get(id=request.session['id']), csvname=data.name, **processCSV(data))
+            request.session['message'] = 'Upload Successful'
         else:
             request.session['message'] = 'Please Upload A CSV File'
     except Exception as e:
