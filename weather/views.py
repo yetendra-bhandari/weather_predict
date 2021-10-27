@@ -1,10 +1,12 @@
+import io, csv
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.db import IntegrityError
 
 from weather.models import User
-
+from .utils import processCSV 
 
 def home(request):
     if 'id' in request.session:
@@ -22,7 +24,17 @@ def app(request):
 
 
 def upload(request):
-    return HttpResponseRedirect(reverse('app'))
+    try:
+        assert request.method == 'POST'
+        csv = request.FILES['data']
+        if csv.name.endswith('.csv'):
+             processCSV(csv)
+        else:
+            request.session['message'] = 'Please Upload A CSV File'
+    except(AssertionError):
+        pass
+    finally:
+        return HttpResponseRedirect(reverse('app'))
 
 
 def predict(request):
@@ -31,26 +43,28 @@ def predict(request):
 
 def register(request):
     try:
+        assert request.method == 'POST'
         user = User.objects.create(
             name=request.POST['name'], email=request.POST['email'].lower(), password=request.POST['password'])
         request.session['id'] = user.id
         request.session['name'] = user.name
         request.session['message'] = 'Registration Successful'
         return HttpResponseRedirect(reverse('app'))
-    except(IntegrityError):
+    except(AssertionError, IntegrityError):
         request.session['message'] = 'Invalid User Details'
         return HttpResponseRedirect(reverse('home'))
 
 
 def login(request):
     try:
+        assert request.method == 'POST'
         user = User.objects.get(email=request.POST['email'].lower())
         assert user.password == request.POST['password']
         request.session['id'] = user.id
         request.session['name'] = user.name
         request.session['message'] = 'Login Successful'
         return HttpResponseRedirect(reverse('app'))
-    except(User.DoesNotExist, AssertionError):
+    except(AssertionError, User.DoesNotExist):
         request.session['message'] = 'Invalid Email Or Password'
         return HttpResponseRedirect(reverse('home'))
 
