@@ -31,10 +31,11 @@ def upload(request):
             chi2_square = p['chi2_score']
             p.pop('chi2_score', None)
             request.session['message'] = 'Chi Square Values: ' + \
-                str(chi2_square[0]) + '\np-values: ' + str(chi2_square[1])
+                str(chi2_square[0]) + '\n, p-values: ' + str(chi2_square[1])
 
             Data.objects.create(
-                user=User.objects.get(id=request.session['id']), csvname=data.name, **p)
+                user=User.objects.get(id=request.session['id']), csvname=data.name, **processCSV(data))
+            request.session['message'] = 'Upload Successful'
         else:
             request.session['message'] = 'Please Upload A CSV File'
     except Exception as e:
