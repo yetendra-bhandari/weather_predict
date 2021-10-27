@@ -1,12 +1,14 @@
-import io, csv
+import io
+import csv
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.db import IntegrityError
 
-from weather.models import User
-from .utils import processCSV 
+from .models import User, Data
+from .utils import processCSV
+
 
 def home(request):
     if 'id' in request.session:
@@ -28,10 +30,11 @@ def upload(request):
         assert request.method == 'POST'
         csv = request.FILES['data']
         if csv.name.endswith('.csv'):
-             processCSV(csv)
+            Data.objects.create(
+                user=request.session['id'], csvname=csv.name, **processCSV(csv))
         else:
             request.session['message'] = 'Please Upload A CSV File'
-    except(AssertionError):
+    except(AssertionError, ZeroDivisionError):
         pass
     finally:
         return HttpResponseRedirect(reverse('app'))
