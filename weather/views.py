@@ -34,8 +34,7 @@ def upload(request):
                 str(chi2_square[0]) + '\n, p-values: ' + str(chi2_square[1])
 
             Data.objects.create(
-                user=User.objects.get(id=request.session['id']), csvname=data.name, **processCSV(data))
-            request.session['message'] = 'Upload Successful'
+                user=User.objects.get(id=request.session['id']), csvname=data.name, **p)
         else:
             request.session['message'] = 'Please Upload A CSV File'
     except Exception as e:
