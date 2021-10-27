@@ -7,22 +7,19 @@
     <title>Weather Predictor</title>
     <style>
       body {
-        background-color: darkslategrey;
-        color: white;
+        background-color: lightblue;
+        color: black;
       }
     </style>
   </head>
   <body>
+    <a href="{% url 'logout' %}">Logout, {{ name }}</a>
     <p>Message: {{ message|default_if_none:"---" }}</p>
     <h2>Upload you previous weather data</h2>
     <form action="{% url 'upload' %}" method="post">
       {% csrf_token %}
       <fieldset>
-        <input
-          type="file"
-          name="data"
-          required
-        />
+        <input type="file" name="data" required />
       </fieldset>
       <input type="submit" value="Upload" />
     </form>
