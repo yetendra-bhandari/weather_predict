@@ -1,9 +1,15 @@
 from .models import Data
+from sklearn.feature_selection import chi2
+from sklearn.feature_selection import SelectKBest
+from sklearn.preprocessing import LabelEncoder
 
 precision = 5
 
 
 def processCSV(data):
+    X = list()
+    Y = list()
+
     rows = data.read().decode('UTF-8').split('\n')
     total_good, total_bad = 0, 0
     good_outlook_sunny, good_outlook_overcast, good_outlook_rainy, good_temp_high, good_temp_mild, good_temp_cool, good_humidity_high, good_humidity_normal, good_windy_true, good_windy_false = [
@@ -12,11 +18,18 @@ def processCSV(data):
         0] * 10
     is_outlook_selected, is_temp_selected, is_humidity_selected, is_windy_selected = [
         True] * 4
+
+    label_encoder = LabelEncoder()
+
     for row in rows[1:]:
         try:
             outlook, temp, humidity, windy, weather = row.split(',')
         except(Exception):
             continue
+
+        x = label_encoder.fit_transform([outlook, temp, humidity, windy])
+        X.append(list(x))
+        Y.append(weather)
 
         if weather == 'good':
             total_good += 1
@@ -80,7 +93,11 @@ def processCSV(data):
             else:
                 bad_windy_false += 1
     total = total_good + total_bad
+
+    chi2_score = calcChiSquare(X, Y)
+
     return {
+        'chi2_score': chi2_score,
         'good_weather': total_good/total,
         'good_outlook_sunny': good_outlook_sunny/total_good,
         'good_outlook_overcast': good_outlook_overcast/total_good,
@@ -111,6 +128,7 @@ def processCSV(data):
 
 
 def getProbability(data: Data, outlook, temp, humidity, windy):
+
     good, bad = data.good_weather, data.bad_weather
 
     if data.is_outlook_selected:
@@ -152,3 +170,13 @@ def getProbability(data: Data, outlook, temp, humidity, windy):
             bad *= data.bad_windy_false
 
     return round(good, precision), round(bad, precision)
+
+
+def calcChiSquare(X, Y):
+    label_encoder = LabelEncoder()
+    y = list(label_encoder.fit_transform(Y))
+
+    chi2score = chi2(X, y)              # (ch2-value, p-value)
+    # chi2_features = SelectKBest(chi2, k='all')
+    # X_kbest_features = chi2_features.fit_transform(X, y)
+    return chi2score

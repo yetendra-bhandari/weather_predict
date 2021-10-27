@@ -27,12 +27,18 @@ def upload(request):
         data = request.FILES['data']
         if data.name.endswith('.csv'):
             p = processCSV(data)
+
+            chi2_square = p['chi2_score']
+            p.pop('chi2_score', None)
+            request.session['message'] = 'Chi Square Values: ' + \
+                str(chi2_square[0]) + '\np-values: ' + str(chi2_square[1])
+
             Data.objects.create(
                 user=User.objects.get(id=request.session['id']), csvname=data.name, **p)
         else:
             request.session['message'] = 'Please Upload A CSV File'
     except Exception as e:
-        print(e)
+        print('Error', e)
     finally:
         return HttpResponseRedirect(reverse('app'))
 
