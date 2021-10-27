@@ -1,9 +1,5 @@
-import csv
-
-
-def processCSV(csv):
-    dataset = csv.read().decode('UTF-8')
-    rows = dataset.split('\n')
+def processCSV(data):
+    rows = data.read().decode('UTF-8').split('\n')
     total_good, total_bad = 0, 0
     good_outlook_sunny, good_outlook_overcast, good_outlook_rainy, good_temp_high, good_temp_mild, good_temp_cool, good_humidity_high, good_humidity_normal, good_windy_true, good_windy_false = [
         0] * 10
@@ -12,8 +8,9 @@ def processCSV(csv):
     is_outlook_selected, is_temp_selected, is_humidity_selected, is_windy_selected = [
         True] * 4
     for row in rows[1:]:
-        outlook, temp, humidity, windy, weather = row.split(',')
-        if not (outlook or temp or humidity or windy or weather):
+        try:
+            outlook, temp, humidity, windy, weather = row.split(',')
+        except(Exception):
             continue
 
         if weather == 'good':
@@ -77,7 +74,6 @@ def processCSV(csv):
                 bad_windy_true += 1
             else:
                 bad_windy_false += 1
-
     total = total_good + total_bad
     return {
         'good_weather': total_good/total,

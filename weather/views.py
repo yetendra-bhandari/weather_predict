@@ -1,12 +1,8 @@
-import io
-import csv
-
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.db import IntegrityError
 
-from .models import User
+from .models import User, Data
 from .utils import processCSV
 
 
@@ -28,13 +24,15 @@ def app(request):
 def upload(request):
     try:
         assert request.method == 'POST'
-        csv = request.FILES['data']
-        if csv.name.endswith('.csv'):
-            processCSV(csv)
+        data = request.FILES['data']
+        if data.name.endswith('.csv'):
+            p = processCSV(data)
+            Data.objects.create(
+                user=User.objects.get(id=request.session['id']), csvname=data.name, **p)
         else:
             request.session['message'] = 'Please Upload A CSV File'
-    except(AssertionError, ZeroDivisionError):
-        pass
+    except Exception as e:
+        print(e)
     finally:
         return HttpResponseRedirect(reverse('app'))
 
@@ -52,7 +50,8 @@ def register(request):
         request.session['name'] = user.name
         request.session['message'] = 'Registration Successful'
         return HttpResponseRedirect(reverse('app'))
-    except(AssertionError, IntegrityError):
+    except Exception as e:
+        print(e)
         request.session['message'] = 'Invalid User Details'
         return HttpResponseRedirect(reverse('home'))
 
@@ -66,7 +65,8 @@ def login(request):
         request.session['name'] = user.name
         request.session['message'] = 'Login Successful'
         return HttpResponseRedirect(reverse('app'))
-    except(AssertionError, User.DoesNotExist):
+    except Exception as e:
+        print(e)
         request.session['message'] = 'Invalid Email Or Password'
         return HttpResponseRedirect(reverse('home'))
 
