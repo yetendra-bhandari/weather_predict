@@ -45,8 +45,10 @@ def predict(request):
         data = Data.objects.get(user__id=request.session['id'], id=data_id)
         good, bad = getProbability(
             data, outlook, temp, humidity, windy)
-        request.session['message'] = 'Good Weather Probability = ' + \
-            str(good) + ', Bad Weather Probability = ' + str(bad)
+        request.session['message'] = 'Good Weather Probability => ' + \
+            str(good) + ', Bad Weather Probability => ' + str(bad) + \
+            ', Prediction => ' + ('Good' if(good > bad)
+                                  else 'Bad') + ' Weather.'
     except Exception as e:
         print(e)
     finally:

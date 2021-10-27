@@ -1,3 +1,8 @@
+from .models import Data
+
+precision = 5
+
+
 def processCSV(data):
     rows = data.read().decode('UTF-8').split('\n')
     total_good, total_bad = 0, 0
@@ -105,5 +110,45 @@ def processCSV(data):
     }
 
 
-def getProbability(data, outlook, temp, humidity, windy):
-    return 0, 0
+def getProbability(data: Data, outlook, temp, humidity, windy):
+    good, bad = data.good_weather, data.bad_weather
+
+    if data.is_outlook_selected:
+        if outlook == 'sunny':
+            good *= data.good_outlook_sunny
+            bad *= data.bad_outlook_sunny
+        elif outlook == 'overcast':
+            good *= data.good_outlook_overcast
+            bad *= data.bad_outlook_overcast
+        else:
+            good *= data.good_outlook_rainy
+            bad *= data.bad_outlook_rainy
+
+    if data.is_temp_selected:
+        if temp == 'high':
+            good *= data.good_temp_high
+            bad *= data.bad_temp_high
+        elif temp == 'mild':
+            good *= data.good_temp_mild
+            bad *= data.bad_temp_mild
+        else:
+            good *= data.good_temp_cool
+            bad *= data.bad_temp_cool
+
+    if data.is_humidity_selected:
+        if humidity == 'high':
+            good *= data.good_humidity_high
+            bad *= data.bad_humidity_high
+        else:
+            good *= data.good_humidity_normal
+            bad *= data.bad_humidity_normal
+
+    if data.is_windy_selected:
+        if windy == 'true':
+            good *= data.good_windy_true
+            bad *= data.bad_windy_true
+        else:
+            good *= data.good_windy_false
+            bad *= data.bad_windy_false
+
+    return round(good, precision), round(bad, precision)
