@@ -154,7 +154,7 @@ def getProbability(data: Data, features, outlook, temp, humidity, windy):
         data.is_windy_selected = False
     data.save()
 
-    if data.is_outlook_selected:
+    if 1 in features_used:
         if outlook == 'sunny':
             good *= data.good_outlook_sunny
             bad *= data.bad_outlook_sunny
@@ -165,7 +165,7 @@ def getProbability(data: Data, features, outlook, temp, humidity, windy):
             good *= data.good_outlook_rainy
             bad *= data.bad_outlook_rainy
 
-    if data.is_temp_selected:
+    if 2 in features_used:
         if temp == 'high':
             good *= data.good_temp_high
             bad *= data.bad_temp_high
@@ -176,7 +176,7 @@ def getProbability(data: Data, features, outlook, temp, humidity, windy):
             good *= data.good_temp_cool
             bad *= data.bad_temp_cool
 
-    if data.is_humidity_selected:
+    if 3 in features_used:
         if humidity == 'high':
             good *= data.good_humidity_high
             bad *= data.bad_humidity_high
@@ -184,7 +184,7 @@ def getProbability(data: Data, features, outlook, temp, humidity, windy):
             good *= data.good_humidity_normal
             bad *= data.bad_humidity_normal
 
-    if data.is_windy_selected:
+    if 4 in features_used:
         if windy == 'true':
             good *= data.good_windy_true
             bad *= data.bad_windy_true
@@ -198,7 +198,9 @@ def getProbability(data: Data, features, outlook, temp, humidity, windy):
 def getFeaturesToUse(chi2score, features_num):
     res_dct = {i: chi2score[i-1] for i in range(1, len(chi2score)+1)}
     sorted_features = {k: v for k, v in sorted(
-        res_dct.items(), key=lambda item: item[1])}
+        res_dct.items(), key=lambda item: item[1], reverse=True)}
+
+    print(chi2score)
 
     nums = 0
     features_used = []
