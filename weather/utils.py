@@ -1,6 +1,5 @@
 from .models import Data
 from sklearn.feature_selection import chi2
-from sklearn.feature_selection import SelectKBest
 from sklearn.preprocessing import LabelEncoder
 
 precision = 5
@@ -141,8 +140,6 @@ def getProbability(data: Data, features, outlook, temp, humidity, windy):
     features_used = getFeaturesToUse([data.chi2_outlook, data.chi2_temp,
                                       data.chi2_humidity, data.chi2_windy], int(features))
 
-    print(features_used)
-
     # update in use flags
     if 1 not in features_used:
         data.is_outlook_selected = False
@@ -192,15 +189,15 @@ def getProbability(data: Data, features, outlook, temp, humidity, windy):
             good *= data.good_windy_false
             bad *= data.bad_windy_false
 
-    return round(good, precision), round(bad, precision)
+    good = round(good * 100/(good + bad))
+    bad = 100 - good
+    return good, bad
 
 
 def getFeaturesToUse(chi2score, features_num):
     res_dct = {i: chi2score[i-1] for i in range(1, len(chi2score)+1)}
     sorted_features = {k: v for k, v in sorted(
         res_dct.items(), key=lambda item: item[1], reverse=True)}
-
-    print(chi2score)
 
     nums = 0
     features_used = []

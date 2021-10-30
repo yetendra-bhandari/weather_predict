@@ -4,7 +4,7 @@ from .models import User, Data
 
 
 class DataAdmin(admin.ModelAdmin):
-    list_display = ['user', 'csvname']
+    list_display = ['csvname']
 
 
 admin.site.register(Data, DataAdmin)

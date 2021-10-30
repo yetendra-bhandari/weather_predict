@@ -18,7 +18,7 @@ def app(request):
         request.session['message'] = 'Login Required'
         return HttpResponseRedirect(reverse('home'))
     message = request.session.pop('message', None)
-    return render(request, 'weather/app.html', {'message': message, 'name': request.session['name'], 'datalist': Data.objects.filter(user__id=request.session['id'])})
+    return render(request, 'weather/app.html', {'message': message, 'name': request.session['name'], 'datalist': Data.objects.all()})
 
 
 def upload(request):
@@ -34,11 +34,11 @@ def upload(request):
                 str(chi2_square[0]) + '\n, p-values: ' + str(chi2_square[1])
 
             Data.objects.create(
-                user=User.objects.get(id=request.session['id']), csvname=data.name, **p)
+                csvname=request.session['name'] + "_" + data.name, **p)
         else:
             request.session['message'] = 'Please Upload A CSV File'
-    except Exception as e:
-        print('Error', e)
+    except Exception:
+        request.session['message'] = 'Invalid CSV File'
     finally:
         return HttpResponseRedirect(reverse('app'))
 
@@ -47,15 +47,14 @@ def predict(request):
     try:
         data_id, features, outlook, temp, humidity, windy = request.GET['data'], request.GET['features'], request.GET[
             'outlook'], request.GET['temp'], request.GET['humidity'], request.GET['windy']
-        data = Data.objects.get(user__id=request.session['id'], id=data_id)
+        data = Data.objects.get(id=data_id)
         good, bad = getProbability(
             data, features, outlook, temp, humidity, windy)
-        request.session['message'] = 'Good Weather Probability => ' + \
-            str(good) + ', Bad Weather Probability => ' + str(bad) + \
-            ', Prediction => ' + ('Good' if(good > bad)
-                                  else 'Bad') + ' Weather.'
+        request.session['message'] = 'Good Weather Probability => ' + str(good) + '%, Bad Weather Probability => ' + str(
+            bad) + '%, Prediction => ' + ('Good' if(good > bad) else 'Bad') + ' Weather.'
     except Exception as e:
         print(e)
+        request.session['message'] = 'Invalid Data Provided'
     finally:
         return HttpResponseRedirect(reverse('app'))
 
@@ -69,9 +68,8 @@ def register(request):
         request.session['name'] = user.name
         request.session['message'] = 'Registration Successful'
         return HttpResponseRedirect(reverse('app'))
-    except Exception as e:
-        print(e)
-        request.session['message'] = 'Invalid User Details'
+    except Exception:
+        request.session['message'] = 'Email Address Already Exists'
         return HttpResponseRedirect(reverse('home'))
 
 
@@ -85,8 +83,10 @@ def login(request):
         request.session['message'] = 'Login Successful'
         return HttpResponseRedirect(reverse('app'))
     except Exception as e:
-        print(e)
-        request.session['message'] = 'Invalid Email Or Password'
+        if (type(e) == User.DoesNotExist):
+            request.session['message'] = 'Email Address Does Not Exist'
+        else:
+            request.session['message'] = 'Incorrect Password'
         return HttpResponseRedirect(reverse('home'))
 
 

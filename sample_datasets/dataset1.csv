@@ -1,0 +1,15 @@
+Outlook,Temperature,Humidity,Windy,Weather
+sunny,high,high,false,bad
+sunny,high,high,true,bad
+overcast,high,high,false,good
+rainy,mild,high,false,good
+rainy,cool,normal,false,good
+rainy,cool,normal,true,bad
+overcast,cool,normal,true,good
+sunny,mild,high,false,bad
+sunny,cool,normal,false,good
+rainy,mild,normal,false,good
+sunny,mild,normal,true,good
+overcast,mild,high,true,good
+overcast,high,normal,false,good
+rainy,mild,high,true,bad

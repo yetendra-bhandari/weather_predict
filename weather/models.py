@@ -11,7 +11,6 @@ class User(models.Model):
 
 
 class Data(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     csvname = models.CharField(max_length=64)
 
     # Good Weather

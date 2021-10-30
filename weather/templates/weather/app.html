@@ -18,7 +18,7 @@
         border-radius: 1.5rem;
       }
 
-      input[type=submit] {
+      input[type="submit"] {
         font-size: 1rem;
         padding: 0.5rem;
         background-color: green;
@@ -44,6 +44,12 @@
     <a href="{% url 'logout' %}">Logout, {{ name }}</a>
     <p class="message">Message: {{ message|default_if_none:"---" }}</p>
     <h2>Upload Weather Data</h2>
+    <p>Preffered Format:</p>
+    <textarea rows="4" cols="50" disabled>Outlook,Temperature,Humidity,Windy,Weather
+sunny,high,high,true,good
+overcast,mild,normal,false,bad
+rainy,cool,high,true,good</textarea>
+    </p>
     <form
       action="{% url 'upload' %}"
       method="post"
@@ -66,17 +72,19 @@
           <option value="{{ data.id }}">{{ data.csvname }}</option>
           {% endfor %}
         </select>
-        <br/>
-        <br/>
-        <label>Top Relevant Features to use in prediction (using chi square): </label>
+        <br />
+        <br />
+        <label
+          >Top Relevant Features to use in prediction (using chi square):
+        </label>
         <select name="features" required>
           <option value="4">All 4</option>
           <option value="3">Top 3</option>
           <option value="2">Top 2</option>
           <option value="1">Top 1</option>
         </select>
-        <br/>
-        <br/>
+        <br />
+        <br />
         <label>Select current weather condition: </label>
         <select name="outlook" required>
           <option value="">Select Outlook</option>
