@@ -41,6 +41,12 @@ class Data(models.Model):
     bad_windy_true = models.DecimalField(max_digits=10, decimal_places=9)
     bad_windy_false = models.DecimalField(max_digits=10, decimal_places=9)
 
+    # chi2 values
+    chi2_outlook = models.DecimalField(max_digits=10, decimal_places=9)
+    chi2_temp = models.DecimalField(max_digits=10, decimal_places=9)
+    chi2_humidity = models.DecimalField(max_digits=10, decimal_places=9)
+    chi2_windy = models.DecimalField(max_digits=10, decimal_places=9)
+
     # Selected Features
     is_outlook_selected = models.BooleanField()
     is_temp_selected = models.BooleanField()

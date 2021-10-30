@@ -45,12 +45,11 @@ def upload(request):
 
 def predict(request):
     try:
-        data_id, outlook, temp, humidity, windy = request.GET['data'], request.GET[
+        data_id, features, outlook, temp, humidity, windy = request.GET['data'], request.GET['features'], request.GET[
             'outlook'], request.GET['temp'], request.GET['humidity'], request.GET['windy']
-        print(data_id, outlook, temp, humidity, windy)
         data = Data.objects.get(user__id=request.session['id'], id=data_id)
         good, bad = getProbability(
-            data, outlook, temp, humidity, windy)
+            data, features, outlook, temp, humidity, windy)
         request.session['message'] = 'Good Weather Probability => ' + \
             str(good) + ', Bad Weather Probability => ' + str(bad) + \
             ', Prediction => ' + ('Good' if(good > bad)

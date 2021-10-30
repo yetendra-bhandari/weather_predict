@@ -9,11 +9,39 @@
       body {
         background-color: lightblue;
         color: black;
+        font-size: 1.2rem;
+      }
+
+      input {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border-radius: 1.5rem;
+      }
+
+      input[type=submit] {
+        font-size: 1rem;
+        padding: 0.5rem;
+        background-color: green;
+        color: white;
+        cursor: pointer;
+      }
+
+      .message {
+        font-size: 1.5rem;
+        margin-bottom: 2.5rem;
+      }
+
+      form {
+        margin-bottom: 2rem;
+      }
+
+      h1 {
+        text-align: center;
       }
     </style>
   </head>
   <body>
-    <p>Message: {{ message|default_if_none:"---" }}</p>
+    <p class="message">Message: {{ message|default_if_none:"---" }}</p>
     <h1>Home Page</h1>
     <h2>Register</h2>
     <form action="{% url 'register' %}" method="post">

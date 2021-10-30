@@ -7,7 +7,7 @@ precision = 5
 
 
 def processCSV(data):
-    X = list()
+    X_encoded = list()
     Y = list()
 
     rows = data.read().decode('UTF-8').split('\n')
@@ -28,7 +28,7 @@ def processCSV(data):
             continue
 
         x = label_encoder.fit_transform([outlook, temp, humidity, windy])
-        X.append(list(x))
+        X_encoded.append(list(x))
         Y.append(weather)
 
         if weather == 'good':
@@ -94,7 +94,11 @@ def processCSV(data):
                 bad_windy_false += 1
     total = total_good + total_bad
 
-    chi2_score = calcChiSquare(X, Y)
+    chi2_score = calcChiSquare(X_encoded, Y)
+    chi2_outlook = chi2_score[0][0]
+    chi2_temp = chi2_score[0][1]
+    chi2_humidity = chi2_score[0][2]
+    chi2_windy = chi2_score[0][3]
 
     return {
         'chi2_score': chi2_score,
@@ -120,6 +124,10 @@ def processCSV(data):
         'bad_humidity_normal': bad_humidity_normal/total_bad,
         'bad_windy_true': bad_windy_true/total_bad,
         'bad_windy_false': bad_windy_false/total_bad,
+        'chi2_outlook': chi2_outlook,
+        'chi2_temp': chi2_temp,
+        'chi2_humidity': chi2_humidity,
+        'chi2_windy': chi2_windy,
         'is_outlook_selected': is_outlook_selected,
         'is_temp_selected': is_temp_selected,
         'is_humidity_selected': is_humidity_selected,
@@ -127,9 +135,24 @@ def processCSV(data):
     }
 
 
-def getProbability(data: Data, outlook, temp, humidity, windy):
+def getProbability(data: Data, features, outlook, temp, humidity, windy):
 
     good, bad = data.good_weather, data.bad_weather
+    features_used = getFeaturesToUse([data.chi2_outlook, data.chi2_temp,
+                                      data.chi2_humidity, data.chi2_windy], int(features))
+
+    print(features_used)
+
+    # update in use flags
+    if 1 not in features_used:
+        data.is_outlook_selected = False
+    if 2 not in features_used:
+        data.is_temp_selected = False
+    if 3 not in features_used:
+        data.is_humidity_selected = False
+    if 4 not in features_used:
+        data.is_windy_selected = False
+    data.save()
 
     if data.is_outlook_selected:
         if outlook == 'sunny':
@@ -172,11 +195,24 @@ def getProbability(data: Data, outlook, temp, humidity, windy):
     return round(good, precision), round(bad, precision)
 
 
-def calcChiSquare(X, Y):
+def getFeaturesToUse(chi2score, features_num):
+    res_dct = {i: chi2score[i-1] for i in range(1, len(chi2score)+1)}
+    sorted_features = {k: v for k, v in sorted(
+        res_dct.items(), key=lambda item: item[1])}
+
+    nums = 0
+    features_used = []
+    for feature in sorted_features:
+        if nums == features_num:
+            break
+        features_used.append(feature)
+        nums += 1
+    return features_used
+
+
+def calcChiSquare(X_encoded, Y):
     label_encoder = LabelEncoder()
     y = list(label_encoder.fit_transform(Y))
 
-    chi2score = chi2(X, y)              # (ch2-value, p-value)
-    # chi2_features = SelectKBest(chi2, k='all')
-    # X_kbest_features = chi2_features.fit_transform(X, y)
+    chi2score = chi2(X_encoded, y)              # (ch2-value, p-value)
     return chi2score

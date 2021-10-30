@@ -9,12 +9,40 @@
       body {
         background-color: lightblue;
         color: black;
+        font-size: 1.2rem;
+      }
+
+      select {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border-radius: 1.5rem;
+      }
+
+      input[type=submit] {
+        font-size: 1rem;
+        padding: 0.5rem;
+        background-color: green;
+        color: white;
+        cursor: pointer;
+      }
+
+      .message {
+        font-size: 1.5rem;
+        margin-bottom: 2.5rem;
+      }
+
+      form {
+        margin-bottom: 2rem;
+      }
+
+      h1 {
+        text-align: center;
       }
     </style>
   </head>
   <body>
     <a href="{% url 'logout' %}">Logout, {{ name }}</a>
-    <p>Message: {{ message|default_if_none:"---" }}</p>
+    <p class="message">Message: {{ message|default_if_none:"---" }}</p>
     <h2>Upload Weather Data</h2>
     <form
       action="{% url 'upload' %}"
@@ -23,6 +51,7 @@
     >
       {% csrf_token %}
       <fieldset>
+        <label>Upload csv: </label>
         <input type="file" name="data" required />
       </fieldset>
       <input type="submit" value="Upload" />
@@ -37,6 +66,18 @@
           <option value="{{ data.id }}">{{ data.csvname }}</option>
           {% endfor %}
         </select>
+        <br/>
+        <br/>
+        <label>Top Relevant Features to use in prediction (using chi square): </label>
+        <select name="features" required>
+          <option value="4">All 4</option>
+          <option value="3">Top 3</option>
+          <option value="2">Top 2</option>
+          <option value="1">Top 1</option>
+        </select>
+        <br/>
+        <br/>
+        <label>Select current weather condition: </label>
         <select name="outlook" required>
           <option value="">Select Outlook</option>
           <option value="sunny">Sunny</option>
